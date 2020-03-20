@@ -85,7 +85,14 @@ class options(nla):
                ('TCA_NETEM_REORDER', 'netem_reorder'),
                ('TCA_NETEM_CORRUPT', 'netem_corrupt'),
                ('TCA_NETEM_LOSS', 'none'),
-               ('TCA_NETEM_RATE', 'none'))
+               ('TCA_NETEM_RATE', 'none'),
+               ('TCA_NETEM_ECN', 'none'),
+               ('TCA_NETEM_RATE64', 'none'),
+               ('TCA_NETEM_PAD', 'none'),
+               ('TCA_NETEM_LATENCY64', 'netem_latency64'),
+               ('TCA_NETEM_JITTER64', 'netem_jitter64'),
+               ('TCA_NETEM_SLOT', 'none'),
+               ('TCA_NETEM_SLOT_DIST', 'none'))
 
     fields = (('delay', 'I'),
               ('limit', 'I'),
@@ -99,6 +106,14 @@ class options(nla):
         fields = (('delay_corr', 'I'),
                   ('loss_corr', 'I'),
                   ('dup_corr', 'I'))
+
+    class netem_latency64(nla):
+        '''latency in 64-bit'''
+        fields = (('delay', 'q'), )
+
+    class netem_jitter64(nla):
+        '''jitter in 64-bit'''
+        fields = (('jitter', 'q'), )
 
     class netem_reorder(nla):
         '''reorder has probability and correlation'''
