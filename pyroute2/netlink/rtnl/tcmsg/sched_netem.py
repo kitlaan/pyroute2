@@ -85,13 +85,13 @@ class options(nla):
                ('TCA_NETEM_REORDER', 'netem_reorder'),
                ('TCA_NETEM_CORRUPT', 'netem_corrupt'),
                ('TCA_NETEM_LOSS', 'none'),
-               ('TCA_NETEM_RATE', 'none'),
+               ('TCA_NETEM_RATE', 'netem_rate'),
                ('TCA_NETEM_ECN', 'none'),
-               ('TCA_NETEM_RATE64', 'none'),
+               ('TCA_NETEM_RATE64', 'netem_rate64'),
                ('TCA_NETEM_PAD', 'none'),
                ('TCA_NETEM_LATENCY64', 'netem_latency64'),
                ('TCA_NETEM_JITTER64', 'netem_jitter64'),
-               ('TCA_NETEM_SLOT', 'none'),
+               ('TCA_NETEM_SLOT', 'netem_slot'),
                ('TCA_NETEM_SLOT_DIST', 'none'))
 
     fields = (('delay', 'I'),
@@ -124,3 +124,23 @@ class options(nla):
         '''corruption has probability and correlation'''
         fields = (('prob_corrupt', 'I'),
                   ('corr_corrupt', 'I'))
+
+    class netem_rate64(nla):
+        '''rate in 64-bit'''
+        fields = (('rate', 'Q'), )
+
+    class netem_rate(nla):
+        '''rate'''
+        fields = (('rate', 'I'),
+                  ('packet_overhead', 'I'),
+                  ('cell_size', 'I'),
+                  ('cell_overhead', 'I'))
+
+    class netem_slot(nla):
+        '''slot'''
+        fields = (('min_delay', 'q'),
+                  ('max_delay', 'q'),
+                  ('max_packets', 'i'),
+                  ('max_bytes', 'i'),
+                  ('dist_delay', 'q'),
+                  ('dist_jitter', 'q'))
