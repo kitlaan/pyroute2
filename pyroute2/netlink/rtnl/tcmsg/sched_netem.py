@@ -2,6 +2,7 @@ from pyroute2.netlink import nla
 from pyroute2.netlink.rtnl import TC_H_ROOT
 from pyroute2.netlink.rtnl.tcmsg.common import time2tick
 from pyroute2.netlink.rtnl.tcmsg.common import percent2u32
+from pyroute2.netlink.rtnl.tcmsg.common import u32_percent
 
 parent = TC_H_ROOT
 
@@ -11,7 +12,7 @@ def get_parameters(kwarg):
     limit = kwarg.get('limit', 1000)  # fifo limit (packets) see netem.c:230
     loss = percent2u32(kwarg.get('loss', 0))  # int percentage
     gap = kwarg.get('gap', 0)
-    duplicate = kwarg.get('duplicate', 0)
+    duplicate = percent2u32(kwarg.get('duplicate', 0))
     jitter = time2tick(kwarg.get('jitter', 0))  # in microsecond
 
     opts = {
@@ -101,11 +102,22 @@ class options(nla):
               ('duplicate', 'I'),
               ('jitter', 'I'))
 
+    def decode(self):
+        nla.decode(self)
+        self['loss'] = round(u32_percent(self['loss']), 2)
+        self['duplicate'] = round(u32_percent(self['duplicate']), 2)
+
     class netem_corr(nla):
         '''correlation'''
         fields = (('delay_corr', 'I'),
                   ('loss_corr', 'I'),
                   ('dup_corr', 'I'))
+
+        def decode(self):
+            nla.decode(self)
+            self['delay_corr'] = round(u32_percent(self['delay_corr']), 2)
+            self['loss_corr'] = round(u32_percent(self['loss_corr']), 2)
+            self['dup_corr'] = round(u32_percent(self['dup_corr']), 2)
 
     class netem_latency64(nla):
         '''latency in 64-bit'''
@@ -120,10 +132,20 @@ class options(nla):
         fields = (('prob_reorder', 'I'),
                   ('corr_reorder', 'I'))
 
+        def decode(self):
+            nla.decode(self)
+            self['prob_reorder'] = round(u32_percent(self['prob_reorder']), 2)
+            self['corr_reorder'] = round(u32_percent(self['corr_reorder']), 2)
+
     class netem_corrupt(nla):
         '''corruption has probability and correlation'''
         fields = (('prob_corrupt', 'I'),
                   ('corr_corrupt', 'I'))
+
+        def decode(self):
+            nla.decode(self)
+            self['prob_corrupt'] = round(u32_percent(self['prob_corrupt']), 2)
+            self['corr_corrupt'] = round(u32_percent(self['corr_corrupt']), 2)
 
     class netem_rate64(nla):
         '''rate in 64-bit'''

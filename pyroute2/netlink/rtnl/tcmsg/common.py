@@ -96,6 +96,11 @@ def percent2u32(pct):
     return int((2 ** 32 - 1) * pct / 100)
 
 
+def u32_percent(value):
+    '''inverse of percent2u32'''
+    return (float(value) / (2 ** 32 - 1)) * 100
+
+
 def red_eval_ewma(qmin, burst, avpkt):
     # The code is ported from tc utility
     wlog = 1
