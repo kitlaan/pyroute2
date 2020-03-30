@@ -29,7 +29,7 @@ def get_parameters(kwarg):
     delay_corr = percent2u32(kwarg.get('delay_corr', 0))
     loss_corr = percent2u32(kwarg.get('loss_corr', 0))
     dup_corr = percent2u32(kwarg.get('dup_corr', 0))
-    if delay_corr or loss_corr or dup_corr:
+    if kwarg.get('delay_corr') is not None or kwarg.get('loss_corr') is not None or kwarg.get('dup_corr') is not None:
         # delay_corr requires that both jitter and delay are != 0
         if delay_corr and not (delay and jitter):
             raise Exception('delay correlation requires delay'
@@ -49,7 +49,7 @@ def get_parameters(kwarg):
     # reorder (probability, correlation)
     prob_reorder = percent2u32(kwarg.get('prob_reorder', 0))
     corr_reorder = percent2u32(kwarg.get('corr_reorder', 0))
-    if prob_reorder != 0:
+    if kwarg.get('prob_reorder') is not None:
         # gap defaults to 1 if equal to 0
         if gap == 0:
             opts['gap'] = gap = 1
@@ -66,7 +66,7 @@ def get_parameters(kwarg):
     # corrupt (probability, correlation)
     prob_corrupt = percent2u32(kwarg.get('prob_corrupt', 0))
     corr_corrupt = percent2u32(kwarg.get('corr_corrupt', 0))
-    if prob_corrupt:
+    if kwarg.get('prob_corrupt') is not None:
         opts['attrs'].append(['TCA_NETEM_CORRUPT',
                              {'prob_corrupt': prob_corrupt,
                               'corr_corrupt': corr_corrupt}])
