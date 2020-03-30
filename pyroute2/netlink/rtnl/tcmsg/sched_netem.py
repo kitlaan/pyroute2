@@ -74,6 +74,25 @@ def get_parameters(kwarg):
         raise Exception('corr_corrupt can only be set when '
                         'prob_corrupt is set')
 
+    # rate
+    rate = kwarg.get('rate', 0)
+    packet_overhead = kwarg.get('packet_overhead', 0)
+    cell_size = kwarg.get('cell_size', 0)
+    cell_overhead = kwarg.get('cell_overhead', 0)
+    if kwarg.get('rate') is not None:
+        if rate >= 2 ** 32:
+            opts['attrs'].append(['TCA_NETEM_RATE64',
+                                 {'rate': rate}])
+            rate32 = 2 ** 31 - 1
+        else:
+            rate32 = rate
+        opts['attrs'].append(['TCA_NETEM_RATE',
+                             {'rate': rate32,
+                              'packet_overhead': 0,
+                              'cell_size': 0,
+                              'cell_overhead': 0}])
+    # TODO: Exceptions like the above for non-'rate' fields
+
     # TODO
     # delay distribution (dist_size, dist_data)
     return opts
