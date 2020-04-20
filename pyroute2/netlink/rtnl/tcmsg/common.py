@@ -84,6 +84,10 @@ def time2tick(time):
     return int(time) * tick_in_usec
 
 
+def tick2time(tick):
+    return float(tick) / tick_in_usec
+
+
 def calc_xmittime(rate, size):
     # The code is ported from tc utility
     return int(time2tick(TIME_UNITS_PER_SEC * (float(size) / rate)))

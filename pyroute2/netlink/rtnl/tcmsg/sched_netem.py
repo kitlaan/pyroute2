@@ -1,6 +1,7 @@
 from pyroute2.netlink import nla
 from pyroute2.netlink.rtnl import TC_H_ROOT
 from pyroute2.netlink.rtnl.tcmsg.common import time2tick
+from pyroute2.netlink.rtnl.tcmsg.common import tick2time
 from pyroute2.netlink.rtnl.tcmsg.common import percent2u32
 from pyroute2.netlink.rtnl.tcmsg.common import u32_percent
 
@@ -93,6 +94,14 @@ def get_parameters(kwarg):
                               'cell_overhead': 0}])
     # TODO: Exceptions like the above for non-'rate' fields
 
+    # It is simpler to use the new LATENCY64 and JITTER64 fields, as they are
+    # in nanosecond units natively, without having to deal with tick units.
+    # If these exist in the payload, the kernel will override the old fields.
+    opts['attrs'].append(['TCA_NETEM_LATENCY64',
+                         {'delay': kwarg.get('delay', 0) * 1000}])
+    opts['attrs'].append(['TCA_NETEM_JITTER64',
+                         {'delay': kwarg.get('jitter', 0) * 1000}])
+
     # TODO
     # delay distribution (dist_size, dist_data)
     return opts
@@ -123,6 +132,9 @@ class options(nla):
 
     def decode(self):
         nla.decode(self)
+        # old latency/jitter are in tick units
+        self['delay'] = tick2time(self['delay'])
+        self['jitter'] = tick2time(self['jitter'])
         self['loss'] = round(u32_percent(self['loss']), 2)
         self['duplicate'] = round(u32_percent(self['duplicate']), 2)
 
@@ -139,12 +151,22 @@ class options(nla):
             self['dup_corr'] = round(u32_percent(self['dup_corr']), 2)
 
     class netem_latency64(nla):
-        '''latency in 64-bit'''
+        '''latency in 64-bit (nsec unit)'''
         fields = (('delay', 'q'), )
 
+        def decode(self):
+            nla.decode(self)
+            # convert to usec units
+            self['delay'] = float(self['delay']) / 1000
+
     class netem_jitter64(nla):
-        '''jitter in 64-bit'''
+        '''jitter in 64-bit (nsec unit)'''
         fields = (('jitter', 'q'), )
+
+        def decode(self):
+            nla.decode(self)
+            # convert to usec units
+            self['jitter'] = float(self['jitter']) / 1000
 
     class netem_reorder(nla):
         '''reorder has probability and correlation'''
